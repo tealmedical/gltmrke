@@ -18,29 +18,24 @@
 
 <body>
   <header>
-    yo
+    <a href="/">vælg butik</a>
   </header>
 
-  <main data-controller="hello">
-    <input data-hello-target="zip" type="text">
+  <main data-controller="clearances">
+    <h1 data-clearances-target="name"></h1>
 
-    <button data-action="click->hello#greet">
-      Greet
-    </button>
-
-    <span data-hello-target="output">
-    </span>
-
-    <ol>
-      <template data-hello-target="template">
-        <li>
-          <a href="">yo</a>
-        </li>
-      </template>
+    <ol class="grid" data-clearances-target="output">
     </ol>
+
+    <template data-clearances-target="template">
+      <li class="clearance">
+        <h2></h2>
+        <img src="" />
+      </li>
+    </template>
   </main>
 
-  <footer>Fod</footer>
+  <footer>farvel</footer>
 </body>
 
 </html>
