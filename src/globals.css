@@ -5,7 +5,7 @@
 
 /* layout */
 
-body {
+#root {
   max-width: 100vw;
   min-height: 100vh;
   overflow-x: hidden;
@@ -54,41 +54,6 @@ a {
     position: absolute;
     color: white;
   }
-
-  & .stock {
-    left: 0;
-    top: 0;
-  }
-
-  & .discount {
-    right: 0;
-    bottom: 0;
-  }
-
-  & .price {
-    left: 0;
-    bottom: 0;
-  }
-
-  & .top-left {
-    top: 0;
-    left: 0;
-  }
-
-  & .bottom-right {
-    right: 0;
-    bottom: 0;
-  }
-
-  & .bottom-left {
-    left: 0;
-    bottom: 0;
-  }
-
-  & .percentage {
-    top: 0;
-    right: 0;
-  }
 }
 
 @supports (width: min(100px, 100%)) {
@@ -104,6 +69,22 @@ ul {
   }
 }
 
+/* utilities */
 .center {
   text-align: center;
+}
+
+.top-left {
+  top: 0;
+  left: 0;
+}
+
+.bottom-right {
+  right: 0;
+  bottom: 0;
+}
+
+.bottom-left {
+  left: 0;
+  bottom: 0;
 }

@@ -1,10 +1,5 @@
 import './globals.css'
 
-export const metadata = {
-  title: 'Gult Mærke 🛒',
-  description: 'Salling dato-varer',
-}
-
 export default function Layout({ children }) {
   return (
     <>
