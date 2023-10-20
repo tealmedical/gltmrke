@@ -1,46 +1,13 @@
 <!doctype html>
-<html lang="da">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gult Mærke</title>
-  <link rel="stylesheet" href="/stylesheets/application.css">
-  <script type="importmap">
-    {
-      "imports": {
-        "@hotwired/stimulus": "/javascript/vendor/stimulus.js"
-      }
-    }
-  </script>
-  <script type="module" src="/javascript/application.js"></script>
-</head>
-
-<body>
-  <header>
-    yo
-  </header>
-
-  <main data-controller="hello">
-    <input data-hello-target="zip" type="text">
-
-    <button data-action="click->hello#greet">
-      Greet
-    </button>
-
-    <span data-hello-target="output">
-    </span>
-
-    <ol>
-      <template data-hello-target="template">
-        <li>
-          <a href="">yo</a>
-        </li>
-      </template>
-    </ol>
-  </main>
-
-  <footer>Fod</footer>
-</body>
-
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
