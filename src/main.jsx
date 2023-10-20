@@ -4,22 +4,25 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import App from './App.jsx'
-import './index.css'
+import Layout from './layout';
+import Map from './map'
+import Store from './store'
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>root</div>,
+    element: <Map />,
   },
   {
     path: "/stores/:id",
-    element: <div>stors</div>,
+    element: <Store />,
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Layout>
+      <RouterProvider router={router} />
+    </Layout>
   </React.StrictMode>,
 )
