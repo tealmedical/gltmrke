@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 
 import "./map.css";
@@ -44,6 +45,7 @@ const fetcher = (url) =>
   }).then((res) => res.json());
 
 export default function MapPage() {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   useEffect(() => {
     fetch("https://api.sallinggroup.com/v2/stores?fields=coordinates,name,id,brand&per_page=10000", {
@@ -58,7 +60,7 @@ export default function MapPage() {
 
   const [lng, setLng] = useState(12.568196510606882);
   const [lat, setLat] = useState(55.67389271215473);
-  
+
   useEffect(() => {
     const onError = (pars) => {
       console.log("navigator error")
@@ -85,7 +87,7 @@ export default function MapPage() {
   const mapRef = useRef();
 
   if (!data) return null;
- 
+
 
   return (
     <>
@@ -95,7 +97,7 @@ export default function MapPage() {
         </h1>
         <h2 style={{ fontSize: "2vh", textAlign: "center" }}>Vælg butik</h2>
         <MapContainer center={[lat, lng]} zoom={13}>
-        <ChangeView center={[lat, lng]} />
+          <ChangeView center={[lat, lng]} />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -119,9 +121,9 @@ export default function MapPage() {
                       "lng",
                       e.sourceTarget.options.data[1]
                     );
-                   
+
                     //setLat(e.sourceTarget.options.data[0])
-                    window.location=`/stores/${val.id}`
+                    navigate(`/stores/${val.id}`);
                   },
                 }}
               ></Marker>
