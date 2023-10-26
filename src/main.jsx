@@ -1,28 +1,28 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import Layout from './layout';
-import Map from './map'
-import Store from './store'
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+import Help from './routes/help';
+import Layout from './routes/layout';
+import Map from './routes/map'
+import Store, { loader as storeLoader } from './routes/store'
+
+import './globals.css'
+
+// see https://reactrouter.com/en/main/routers/create-browser-router
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Map />,
-  },
-  {
-    path: "/stores/:id",
-    element: <Store />,
-  },
+    path: "*", Component: Layout, children: [
+      { index: true, Component: Map, },
+      { path: "stores/:id", Component: Store, loader: storeLoader },
+      { path: "hjælp!", Component: Help }
+    ]
+  }
 ]);
 
+// see https://react.dev/reference/react-dom/client/createRoot
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Layout>
-      <RouterProvider router={router} />
-    </Layout>
+    <RouterProvider router={router} />
   </React.StrictMode>,
 )

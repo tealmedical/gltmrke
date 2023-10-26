@@ -1,13 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { SALLING_TOKEN } from "./constants";
-
-const host = "https://api.sallinggroup.com/v1/"
-
+import { useLoaderData } from 'react-router-dom';
+import { SALLING_HOST, SALLING_TOKEN } from "../constants";
 
 const daysInPast = (s) => {
   //get date from string
-  console.log(s)
   var b = s.split(/\D+/);
   const date = new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]))
   const today = new Date()
@@ -17,7 +12,6 @@ const daysInPast = (s) => {
 
   return daysInPast
 }
-
 
 const dateText = (stringDate) => {
   const d = daysInPast(stringDate)
@@ -55,30 +49,23 @@ function getRange(clearances) {
   return [min, max]
 }
 
+// see https://reactrouter.com/en/main/start/tutorial#loading-data
+export async function loader({ params }) {
+  const response = await fetch(`${SALLING_HOST}food-waste/${params.id}`, {
+    headers: { Authorization: `bearer ${SALLING_TOKEN}` }
+  });
 
+  return await response.json();
+}
 
 export default function Store() {
-  const params = useParams();
+  const data = useLoaderData();
 
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    fetch(`${host}food-waste/${params.id}`, {
-      headers: {
-        Authorization: `bearer ${SALLING_TOKEN}`,
-      },
-    }).then(async (res) => {
-      const data = await res.json()
-      setData(data);
-    });
-  }, [])
-
-  if (!data) return <h2>Indlæser</h2>;
   if (data.clearances.length == 0) return <h2>Der var desværre ingen gule mærker i denne butik</h2>;
 
   const { store, clearances } = data;
 
   const range = getRange(clearances);
-  //console.log(clearances)
   return (
     <main>
       <h1>{store.name}</h1>
@@ -95,10 +82,10 @@ export default function Store() {
               width="200"
               height="200"
             /> : <div style={{ fontSize: 30, overflowWrap: "break-word" }} >{clearance.product.description}</div>}
-            <span className="bottom-left"><p>{clearance.offer.stock} tilbage</p><p>{dateText(clearance.offer.lastUpdate)}</p></span>
+            <span className="bottom left"><p>{clearance.offer.stock} tilbage</p><p>{dateText(clearance.offer.lastUpdate)}</p></span>
             {/*<span className="percentage">% {clearance.offer.percentDiscount}</span>*/}
             {/*<span className="original-price">før {clearance.offer.originalPrice},-</span>*/}
-            <span className="bottom-right"><p>Før <b>{clearance.offer.originalPrice}</b>,-</p><p> Nu kun <b>{clearance.offer.newPrice}</b>,-</p></span>
+            <span className="bottom right"><p>Før <b>{clearance.offer.originalPrice}</b>,-</p><p> Nu kun <b>{clearance.offer.newPrice}</b>,-</p></span>
             {/*<span className="new-price">nu kun {clearance.offer.newPrice},-</span>*/}
             {/*
               <h2>{clearance.product.description} ({clearance.offer.percentDiscount}%)</h2>
