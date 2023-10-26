@@ -1,5 +1,5 @@
 import { useLoaderData, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { Icon } from "leaflet";
 
 import { SALLING_HOST, SALLING_TOKEN } from "../constants";
@@ -26,6 +26,13 @@ const CENTRAL_COPENHAGEN = {
   longitude: 12.568196510606882,
 }
 
+function ChangeView({ center }) {
+  const map = useMap();
+  console.log(center)
+  map.setView([center.latitude, center.longitude], 15);
+  return null;
+}
+
 // see https://reactrouter.com/en/main/start/tutorial#loading-data
 export async function loader() {
   const response = await fetch(`${SALLING_HOST}/v2/stores?fields=coordinates,name,id,brand&per_page=10000"`, {
@@ -43,12 +50,13 @@ export default function MapPage() {
   const navigate = useNavigate();
 
   const [sessionLocation, setSessionLocation] = useSessionStorage("mapPosition", null);
-  const geolocation = useGeolocation();
+  // don't ask for geolocation if we have session location
+  const geolocation = useGeolocation({ skipIf: Boolean(sessionLocation) });
 
   // priority: sessionStorage, then geolocation, fallback to default position
-  const initialCenter = sessionLocation || geolocation || CENTRAL_COPENHAGEN;
+  const center = sessionLocation || geolocation || CENTRAL_COPENHAGEN;
   // slightly zoomed out when using default position
-  const initialZoom = initialCenter == CENTRAL_COPENHAGEN ? 13 : 15;
+  const initialZoom = center == CENTRAL_COPENHAGEN ? 13 : 15;
 
   // filter out unsupported stores
   const supportedStores = stores.filter((store) => SUPPORTED_BRANDS.includes(store.brand));
@@ -68,9 +76,10 @@ export default function MapPage() {
       <h2>VELKOMMEN TIL GULTMÆRKE.DK</h2>
       <h3>Vælg butik</h3>
       <MapContainer
-        center={[initialCenter.latitude, initialCenter.longitude]}
+        center={[center.latitude, center.longitude]}
         zoom={initialZoom}
       >
+        <ChangeView center={center} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
