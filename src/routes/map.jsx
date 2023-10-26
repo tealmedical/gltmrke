@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 
-import "./map.css";
 import React, { useState, useEffect, useRef } from "react";
 import {
   MapContainer,
@@ -12,7 +11,7 @@ import {
   useMapEvent,
 } from "react-leaflet";
 import { Icon } from "leaflet";
-import { SALLING_TOKEN } from "./constants";
+import { SALLING_TOKEN } from "../constants";
 
 function ChangeView({ center }) {
   const map = useMap();
@@ -91,7 +90,7 @@ export default function MapPage() {
 
   return (
     <>
-      <div>
+      <div className="map">
         <h1 style={{ fontSize: "3vh", textAlign: "center" }}>
           VELKOMMEN TIL GULTMÆRKE.DK
         </h1>
