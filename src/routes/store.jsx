@@ -1,40 +1,11 @@
 import { useLoaderData } from 'react-router-dom';
 import { SALLING_HOST, SALLING_TOKEN } from "../constants";
 
-const daysInPast = (s) => {
-  //get date from string
-  var b = s.split(/\D+/);
-  const date = new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]))
-  const today = new Date()
-  const timeDifference = today - date;
+import { colorInRange } from '../lib/color';
+import { dateText } from '../lib/date'
+import { byRandom } from '../lib/sort'
 
-  const daysInPast = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-
-  return daysInPast
-}
-
-const dateText = (stringDate) => {
-  const d = daysInPast(stringDate)
-  if (d == 0) {
-    return <>Set i dag</>
-  } else if (d == 1) {
-    return <>Set i går</>
-  } else {
-    return <>Set for {d} dage siden</>
-  }
-}
-
-function byDiscount(a, b) {
-  return Math.random()
-  return b.offer.discount - a.offer.discount
-}
-
-function colorInRange(range, value) {
-  const [min, max] = range;
-  const hue = (value - min) / (max - min) * 100;
-  return `hsla(${hue}, 100%, 50%, 1)`;
-}
-
+// extract minimum and maximum discount values from list of offers
 function getRange(clearances) {
   let min = Infinity;
   let max = -Infinity;
@@ -51,7 +22,7 @@ function getRange(clearances) {
 
 // see https://reactrouter.com/en/main/start/tutorial#loading-data
 export async function loader({ params }) {
-  const response = await fetch(`${SALLING_HOST}food-waste/${params.id}`, {
+  const response = await fetch(`${SALLING_HOST}/v1/food-waste/${params.id}`, {
     headers: { Authorization: `bearer ${SALLING_TOKEN}` }
   });
 
@@ -59,46 +30,47 @@ export async function loader({ params }) {
 }
 
 export default function Store() {
-  const data = useLoaderData();
+  // see https://reactrouter.com/en/main/hooks/use-loader-data
+  const { store, clearances } = useLoaderData();
 
-  if (data.clearances.length == 0) return <h2>Der var desværre ingen gule mærker i denne butik</h2>;
-
-  const { store, clearances } = data;
+  if (clearances.length == 0) return <h2>Der var desværre ingen gule mærker i denne butik</h2>;
 
   const range = getRange(clearances);
+
+  // clearances.sort(by(x => x.offer.discount));
+  clearances.sort(byRandom);
+
   return (
-    <main>
+    <>
       <h1>{store.name}</h1>
       <ol className="grid">
-        {clearances.sort(byDiscount).map(clearance => (
+        {clearances.map(({ product, offer }) => (
           <li
-            key={clearance.product.ean}
+            key={product.ean}
             className="clearance"
-            style={{ background: colorInRange(range, clearance.offer.discount), display: "flex", justifyContent: "center", alignItems: "center" }}
+            style={{ backgroundColor: colorInRange(range, offer.discount) }}
           >
-            {clearance.product.image ? <img style={{ objectFit: "contain" }}
-              src={clearance.product.image}
-              alt={clearance.product.description}
-              width="200"
-              height="200"
-            /> : <div style={{ fontSize: 30, overflowWrap: "break-word" }} >{clearance.product.description}</div>}
-            <span className="bottom left"><p>{clearance.offer.stock} tilbage</p><p>{dateText(clearance.offer.lastUpdate)}</p></span>
-            {/*<span className="percentage">% {clearance.offer.percentDiscount}</span>*/}
-            {/*<span className="original-price">før {clearance.offer.originalPrice},-</span>*/}
-            <span className="bottom right"><p>Før <b>{clearance.offer.originalPrice}</b>,-</p><p> Nu kun <b>{clearance.offer.newPrice}</b>,-</p></span>
-            {/*<span className="new-price">nu kun {clearance.offer.newPrice},-</span>*/}
-            {/*
-              <h2>{clearance.product.description} ({clearance.offer.percentDiscount}%)</h2>
-              <p>{clearance.offer.stock} tilbage!</p>
-              <p>
-                <del>{clearance.offer.originalPrice}</del>
-                <span>{clearance.offer.newPrice}</span>
-                <span>(spar {clearance.offer.discount})</span>
-              </p>
-            */}
+            {product.image ? (
+              <img
+                src={product.image}
+                alt={product.description}
+                width="200"
+                height="200"
+              />
+            ) : (
+              <p className="fallback">{product.description}</p>
+            )}
+            <span className="bottom left">
+              <p>{offer.stock} tilbage</p>
+              <p>{dateText(offer.lastUpdate)}</p>
+            </span>
+            <span className="bottom right">
+              <p>Før <b>{offer.originalPrice}</b>,-</p>
+              <p>Nu kun <b>{offer.newPrice}</b>,-</p>
+            </span>
           </li>
         ))}
       </ol>
-    </main>
-  )
+    </>
+  );
 }

@@ -1,138 +1,95 @@
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { useLoaderData, useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { Icon } from "leaflet";
+
+import { SALLING_HOST, SALLING_TOKEN } from "../constants";
+import { useGeolocation } from "../lib/geolocation";
+import { useSessionStorage } from "../lib/storage";
+
+// see https://vitejs.dev/guide/assets.html#static-asset-handling
+import bilkaIcon from '../assets/images/bilka.png'
+import føtexIcon from '../assets/images/føtex.png'
+import nettoIcon from '../assets/images/netto.png'
+
 import "leaflet/dist/leaflet.css";
 
-import React, { useState, useEffect, useRef } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  useMap,
-  useMapEvents,
-  useMapEvent,
-} from "react-leaflet";
-import { Icon } from "leaflet";
-import { SALLING_TOKEN } from "../constants";
-
-import bilkaIcon from './assets/images/bilka.png'
-import føtexIcon from './assets/images/føtex.png'
-import nettoIcon from './assets/images/netto.png'
-
-function ChangeView({ center }) {
-  const map = useMap();
-  map.setView(center, 15);
-  return null;
+function urlify(name) {
+  return name.toLowerCase()
+    .replace(/\s/g, '-') // convert dash to space
+    .replace(/[^a-zæøå\s\-]/g, ''); // keep only letters and dashes
 }
 
-
-const iconSize = [50, 50];
-const icons = {
-  bilka: new Icon({
-    iconUrl: bilkaIcon,
-    iconSize,
-  }),
-  foetex: new Icon({
-    iconUrl: føtexIcon,
-    iconSize,
-  }),
-  netto: new Icon({
-    iconUrl: nettoIcon,
-    iconSize,
-  }),
+const ICON_SIZE = [50, 50];
+const ICONS = {
+  bilka: new Icon({ iconUrl: bilkaIcon, iconSize: ICON_SIZE }),
+  foetex: new Icon({ iconUrl: føtexIcon, iconSize: ICON_SIZE }),
+  netto: new Icon({ iconUrl: nettoIcon, iconSize: ICON_SIZE }),
 };
-const supportedBrands = ["foetex", "netto", "bilka"];
-const fetcher = (url) =>
-  fetch(url, {
-    headers: {
-      Authorization: `bearer ${SALLING_TOKEN}`,
-    },
-  }).then((res) => res.json());
+const SUPPORTED_BRANDS = ["foetex", "netto", "bilka"];
+const DEFAULT_POSITION = {
+  latitude: 55.67389271215473,
+  longitude: 12.568196510606882,
+}
+
+// see https://reactrouter.com/en/main/start/tutorial#loading-data
+export async function loader() {
+  const response = await fetch(`${SALLING_HOST}/v2/stores?fields=coordinates,name,id,brand&per_page=10000"`, {
+    headers: { Authorization: `bearer ${SALLING_TOKEN}` }
+  });
+
+  return await response.json();
+}
 
 export default function MapPage() {
+  // see https://reactrouter.com/en/main/hooks/use-loader-data
+  const stores = useLoaderData();
+
+  // see https://reactrouter.com/en/main/hooks/use-navigate
   const navigate = useNavigate();
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    fetch("https://api.sallinggroup.com/v2/stores?fields=coordinates,name,id,brand&per_page=10000", {
-      headers: {
-        Authorization: `bearer ${SALLING_TOKEN}`,
-      },
-    }).then(async (res) => {
-      const data = await res.json()
-      setData(data);
-    });
-  }, [])
 
-  const [lng, setLng] = useState(12.568196510606882);
-  const [lat, setLat] = useState(55.67389271215473);
+  const [sessionLocation, setSessionLocation] = useSessionStorage("mapPosition", null);
+  const geolocation = useGeolocation();
 
-  useEffect(() => {
-    const onError = (pars) => {
-      console.log("navigator error")
-    };
-    const onSuccess = (pars) => {
-      console.log("pos fromm navigator")
-      setLat(pars.coords.latitude);
-      setLng(pars.coords.longitude);
-    };
-    let latLocal = sessionStorage.getItem("lat");
-    let lngLocal = sessionStorage.getItem("lng");
+  // priority: sessionStorage, then geolocation, fallback to default position
+  const initialCenter = sessionLocation || geolocation || DEFAULT_POSITION;
+  // slightly zoomed out when using default position
+  const initialZoom = initialCenter == DEFAULT_POSITION ? 13 : 15;
 
-    if (!(latLocal === null) && !(lngLocal === null)) {
-      console.log("pos from sessionstorage");
+  // filter out unsupported stores
+  const supportedStores = stores.filter((store) => SUPPORTED_BRANDS.includes(store.brand));
 
-      setLat(latLocal);
-      setLng(lngLocal);
-    } else if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(onSuccess, onError);
-    } else {
-    }
-  }, []);
-
-  const mapRef = useRef();
-
-  if (!data) return null;
-
+  function handleStoreClick(event) {
+    const store = event.target.options.data;
+    // update sessionStorage (will be used when returning to map)
+    const [longitude, latitude] = store.coordinates;
+    setSessionLocation({ latitude, longitude });
+    // trigger navigation to store page
+    navigate(`/${urlify(store.name)}/${store.id}`);
+  }
 
   return (
-    <>
-      <div className="map">
-        <h1 style={{ fontSize: "3vh", textAlign: "center" }}>
-          VELKOMMEN TIL GULTMÆRKE.DK
-        </h1>
-        <h2 style={{ fontSize: "2vh", textAlign: "center" }}>Vælg butik</h2>
-        <MapContainer center={[lat, lng]} zoom={13}>
-          <ChangeView center={[lat, lng]} />
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    <div className="map">
+      <h2>VELKOMMEN TIL GULTMÆRKE.DK</h2>
+      <h3>Vælg butik</h3>
+      <MapContainer
+        center={[initialCenter.latitude, initialCenter.longitude]}
+        zoom={initialZoom}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        {supportedStores.map((store) => (
+          <Marker
+            key={store.id}
+            icon={ICONS[store.brand]}
+            position={[store.coordinates[1], store.coordinates[0]]}
+            data={store}
+            eventHandlers={{ click: handleStoreClick }}
           />
-          {data
-            .filter((val) => supportedBrands.includes(val.brand))
-            .map((val) => (
-              <Marker
-                icon={icons[val.brand]}
-                key={val.id}
-                position={[val.coordinates[1], val.coordinates[0]]}
-                data={[val.coordinates[1], val.coordinates[0]]}
-                eventHandlers={{
-                  click: (e) => {
-                    console.log(e.sourceTarget.options.data);
-                    sessionStorage.setItem(
-                      "lat",
-                      e.sourceTarget.options.data[0]
-                    );
-                    sessionStorage.setItem(
-                      "lng",
-                      e.sourceTarget.options.data[1]
-                    );
-
-                    //setLat(e.sourceTarget.options.data[0])
-                    navigate(`/stores/${val.id}`);
-                  },
-                }}
-              ></Marker>
-            ))}
-        </MapContainer>
-      </div>
-    </>
+        ))}
+      </MapContainer>
+    </div>
   );
 }

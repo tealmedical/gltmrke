@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Help from './routes/help';
 import Layout from './routes/layout';
-import Map from './routes/map'
+import Map, { loader as mapLoader } from './routes/map'
 import Store, { loader as storeLoader } from './routes/store'
 
 import './globals.css'
@@ -13,9 +13,9 @@ import './globals.css'
 const router = createBrowserRouter([
   {
     path: "*", Component: Layout, children: [
-      { index: true, Component: Map, },
-      { path: "stores/:id", Component: Store, loader: storeLoader },
-      { path: "hjælp!", Component: Help }
+      { index: true, Component: Map, loader: mapLoader },
+      { path: "hjælp!", Component: Help },
+      { path: ":name/:id", Component: Store, loader: storeLoader },
     ]
   }
 ]);

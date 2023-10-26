@@ -82,6 +82,17 @@ a {
   color: hsl(53, 91%, 10%);
 }
 
+
+h2 {
+  font-size: calc(2rem + 0.5vw);
+  text-align: center;
+}
+
+h3 {
+  font-size: calc(1rem + 0.5vw);
+  text-align: center;
+}
+
 .grid {
   display: grid;
   grid-gap: 1rem;
@@ -91,8 +102,13 @@ a {
   position: relative;
   height: 200px;
 
+  display: "flex";
+  justify-content: "center";
+  align-items: "center";
+
   & img {
     position: absolute;
+    object-fit: contain;
     inset: 0;
   }
 
@@ -100,6 +116,11 @@ a {
     background: black;
     position: absolute;
     color: white;
+  }
+
+  & .fallback {
+    font-size: 30px;
+    overflow-wrap: break-word;
   }
 }
 
