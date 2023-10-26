@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Help from './routes/help';
 import Layout from './routes/layout';
 import Map, { loader as mapLoader } from './routes/map'
+import NotFound from './routes/not_found';
 import Store, { loader as storeLoader } from './routes/store'
 
 import './globals.css'
@@ -16,7 +17,8 @@ const router = createBrowserRouter([
       { index: true, Component: Map, loader: mapLoader },
       { path: "hjælp!", Component: Help },
       { path: ":name/:id", Component: Store, loader: storeLoader },
-    ]
+      { path: "*", Component: NotFound },
+    ],
   }
 ]);
 
