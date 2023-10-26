@@ -8,5 +8,5 @@
 export function urlify(name) {
   return name.toLowerCase()
     .replace(/\s/g, '-') // convert space to dash
-    .replace(/[^a-zæøå\s\-]/g, ''); // keep only letters and dashes
+    .replace(/[^0-9a-zæøå\s\-]/g, ''); // keep only letters and dashes
 }
