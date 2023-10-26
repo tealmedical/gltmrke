@@ -1,4 +1,3 @@
-import React from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { Icon } from "leaflet";

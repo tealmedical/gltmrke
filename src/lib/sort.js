@@ -1,4 +1,4 @@
-export function byRandom(_, __) {
+export function byRandom() {
   return Math.random()
 }
 

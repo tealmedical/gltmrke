@@ -3,7 +3,6 @@ import { SALLING_HOST, SALLING_TOKEN } from "../constants";
 
 import { colorInRange } from '../lib/color';
 import { dateText } from '../lib/date'
-import { byRandom } from '../lib/sort'
 
 // extract minimum and maximum discount values from list of offers
 function getRange(clearances) {
