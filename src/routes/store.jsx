@@ -38,7 +38,6 @@ export default function Store() {
   const range = getRange(clearances);
 
   // clearances.sort(by(x => x.offer.discount));
-  clearances.sort(byRandom);
 
   return (
     <>
