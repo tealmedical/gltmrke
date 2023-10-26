@@ -14,15 +14,18 @@ export function useSessionStorage(key, initialValue, validator) {
   // parse or remove item from storage
   let value = null;
   try {
-    const parsed = JSON.parse(sessionStorage.getItem(key));
-    if (validator && !validator(parsed)) {
-      throw new Error("Session value didn't pass validator")
+    const serialized = sessionStorage.getItem(key);
+    if (serialized) {
+      const parsed = JSON.parse(serialized);
+      if (validator && !validator(parsed)) {
+        throw new Error("Session value didn't pass validator")
+      }
+      value = parsed;
     }
-    value = parsed;
   } catch (error) {
     console.error(error);
     sessionStorage.removeItem(key);
-    console.log("cleared")
+    console.log("cleared value in session storage")
   }
 
   // sync with react state
