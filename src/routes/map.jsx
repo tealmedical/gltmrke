@@ -49,7 +49,7 @@ export default function MapPage() {
   // priority: sessionStorage, then geolocation, fallback to default position
   const initialCenter = sessionLocation || geolocation || CENTRAL_COPENHAGEN;
   // slightly zoomed out when using default position
-  const initialZoom = initialCenter == DEFAULT_POSITION ? 13 : 15;
+  const initialZoom = initialCenter == CENTRAL_COPENHAGEN ? 13 : 15;
 
   // filter out unsupported stores
   const supportedStores = stores.filter((store) => SUPPORTED_BRANDS.includes(store.brand));
