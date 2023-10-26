@@ -13,6 +13,10 @@ import {
 import { Icon } from "leaflet";
 import { SALLING_TOKEN } from "../constants";
 
+import bilkaIcon from './assets/images/bilka.png'
+import føtexIcon from './assets/images/føtex.png'
+import nettoIcon from './assets/images/netto.png'
+
 function ChangeView({ center }) {
   const map = useMap();
   map.setView(center, 15);
@@ -23,15 +27,15 @@ function ChangeView({ center }) {
 const iconSize = [50, 50];
 const icons = {
   bilka: new Icon({
-    iconUrl: "./bilka.png",
+    iconUrl: bilkaIcon,
     iconSize,
   }),
   foetex: new Icon({
-    iconUrl: "./foetex.png",
+    iconUrl: føtexIcon,
     iconSize,
   }),
   netto: new Icon({
-    iconUrl: "./netto.png",
+    iconUrl: nettoIcon,
     iconSize,
   }),
 };
