@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router-dom';
-import { SALLING_HOST, SALLING_TOKEN } from "../constants";
 
+import { fetchSalling } from "../lib/salling";
 import { colorInRange } from '../lib/color';
 import { dateText } from '../lib/date'
 
@@ -21,11 +21,7 @@ function getRange(clearances) {
 
 // see https://reactrouter.com/en/main/start/tutorial#loading-data
 export async function loader({ params }) {
-  const response = await fetch(`${SALLING_HOST}/v1/food-waste/${params.id}`, {
-    headers: { Authorization: `bearer ${SALLING_TOKEN}` }
-  });
-
-  return await response.json();
+  return await fetchSalling(`/v1/food-waste/${params.id}`);
 }
 
 export default function Store() {

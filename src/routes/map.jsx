@@ -1,11 +1,13 @@
 import { useLoaderData, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { Icon } from "leaflet";
 
-import { SALLING_HOST, SALLING_TOKEN } from "../constants";
 import { useGeolocation } from "../lib/geolocation";
 import { useSessionStorage } from "../lib/storage";
 import { urlify } from "../lib/url";
+import { fetchSalling } from "../lib/salling";
+
+import MapCenterTracker from "../components/map_center_tracker";
 
 // see https://vitejs.dev/guide/assets.html#static-asset-handling
 import bilkaIcon from '../assets/images/bilka.png'
@@ -25,21 +27,15 @@ const CENTRAL_COPENHAGEN = {
   latitude: 55.67389271215473,
   longitude: 12.568196510606882,
 }
-
-function ChangeView({ center }) {
-  const map = useMap();
-  console.log(center)
-  map.setView([center.latitude, center.longitude], 15);
-  return null;
-}
+const ZOOM_FAR = 13;
+const ZOOM_NEAR = 15;
 
 // see https://reactrouter.com/en/main/start/tutorial#loading-data
 export async function loader() {
-  const response = await fetch(`${SALLING_HOST}/v2/stores?fields=coordinates,name,id,brand&per_page=10000"`, {
-    headers: { Authorization: `bearer ${SALLING_TOKEN}` }
-  });
-
-  return await response.json();
+  return await fetchSalling("/v2/stores", {
+    fields: "coordinates,name,id,brand",
+    per_page: "10000"
+  })
 }
 
 export default function MapPage() {
@@ -56,7 +52,7 @@ export default function MapPage() {
   // priority: sessionStorage, then geolocation, fallback to default position
   const center = sessionLocation || geolocation || CENTRAL_COPENHAGEN;
   // slightly zoomed out when using default position
-  const initialZoom = center == CENTRAL_COPENHAGEN ? 13 : 15;
+  const zoom = center == CENTRAL_COPENHAGEN ? ZOOM_FAR : ZOOM_NEAR;
 
   // filter out unsupported stores
   const supportedStores = stores.filter((store) => SUPPORTED_BRANDS.includes(store.brand));
@@ -77,9 +73,9 @@ export default function MapPage() {
       <h3>Vælg butik</h3>
       <MapContainer
         center={[center.latitude, center.longitude]}
-        zoom={initialZoom}
+        zoom={zoom}
       >
-        <ChangeView center={center} />
+        <MapCenterTracker center={center} zoom={zoom} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
