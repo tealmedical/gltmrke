@@ -160,7 +160,7 @@ ul {
   left: 0;
 }
 
-.map {
+.atlas {
   & .leaflet-container {
     position: absolute;
     top: 50%;

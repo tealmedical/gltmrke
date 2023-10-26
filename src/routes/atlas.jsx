@@ -1,6 +1,5 @@
 import { useLoaderData, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
-import { Icon } from "leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 
 import { useGeolocation } from "../lib/geolocation";
 import { useSessionStorage } from "../lib/storage";
@@ -8,20 +7,10 @@ import { urlify } from "../lib/url";
 import { fetchSalling } from "../lib/salling";
 
 import MapCenterTracker from "../components/map_center_tracker";
-
-// see https://vitejs.dev/guide/assets.html#static-asset-handling
-import bilkaIcon from '../assets/images/bilka.png'
-import føtexIcon from '../assets/images/føtex.png'
-import nettoIcon from '../assets/images/netto.png'
+import MapBrandMarker from "../components/map_brand_marker";
 
 import "leaflet/dist/leaflet.css";
 
-const ICON_SIZE = [50, 50];
-const ICONS = {
-  bilka: new Icon({ iconUrl: bilkaIcon, iconSize: ICON_SIZE }),
-  foetex: new Icon({ iconUrl: føtexIcon, iconSize: ICON_SIZE }),
-  netto: new Icon({ iconUrl: nettoIcon, iconSize: ICON_SIZE }),
-};
 const SUPPORTED_BRANDS = ["foetex", "netto", "bilka"];
 const CENTRAL_COPENHAGEN = {
   latitude: 55.67389271215473,
@@ -38,7 +27,7 @@ export async function loader() {
   })
 }
 
-export default function MapPage() {
+export default function Atlas() {
   // see https://reactrouter.com/en/main/hooks/use-loader-data
   const stores = useLoaderData();
 
@@ -68,7 +57,7 @@ export default function MapPage() {
   }
 
   return (
-    <div className="map">
+    <div className="atlas">
       <h2>VELKOMMEN TIL GULTMÆRKE.DK</h2>
       <h3>Vælg butik</h3>
       <MapContainer
@@ -81,9 +70,9 @@ export default function MapPage() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {supportedStores.map((store) => (
-          <Marker
+          <MapBrandMarker
             key={store.id}
-            icon={ICONS[store.brand]}
+            brand={store.brand}
             position={[store.coordinates[1], store.coordinates[0]]}
             data={store}
             eventHandlers={{ click: handleStoreClick }}

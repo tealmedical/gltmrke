@@ -2,9 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+import Atlas, { loader as atlasLoader } from './routes/atlas'
 import Help from './routes/help';
 import Layout from './routes/layout';
-import Map, { loader as mapLoader } from './routes/map'
 import NotFound from './routes/not_found';
 import Store, { loader as storeLoader } from './routes/store'
 
@@ -14,7 +14,7 @@ import './globals.css'
 const router = createBrowserRouter([
   {
     path: "*", Component: Layout, children: [
-      { index: true, Component: Map, loader: mapLoader },
+      { index: true, Component: Atlas, loader: atlasLoader },
       { path: "hjælp!", Component: Help },
       { path: ":name/:id", Component: Store, loader: storeLoader },
       { path: "*", Component: NotFound },
