@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
 
+/**
+ * Tries to return the users location using the navigator geolocation API
+ * 
+ * null otherwise
+ */
 export function useGeolocation() {
   const [coords, setCoords] = useState(null);
   useEffect(() => {

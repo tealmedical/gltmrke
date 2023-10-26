@@ -1,5 +1,12 @@
 import { useState } from 'react';
 
+/**
+ * Emulates useState but with a sessionStorage backend
+ * 
+ * Takes care from parsing/stringifying
+ * 
+ * Clears key on parse error
+ */
 export function useSessionStorage(key, initialValue) {
   // parse or remove item from storage
   let value = null;

@@ -6,6 +6,7 @@ import { Icon } from "leaflet";
 import { SALLING_HOST, SALLING_TOKEN } from "../constants";
 import { useGeolocation } from "../lib/geolocation";
 import { useSessionStorage } from "../lib/storage";
+import { urlify } from "../lib/url";
 
 // see https://vitejs.dev/guide/assets.html#static-asset-handling
 import bilkaIcon from '../assets/images/bilka.png'
@@ -14,12 +15,6 @@ import nettoIcon from '../assets/images/netto.png'
 
 import "leaflet/dist/leaflet.css";
 
-function urlify(name) {
-  return name.toLowerCase()
-    .replace(/\s/g, '-') // convert dash to space
-    .replace(/[^a-zæøå\s\-]/g, ''); // keep only letters and dashes
-}
-
 const ICON_SIZE = [50, 50];
 const ICONS = {
   bilka: new Icon({ iconUrl: bilkaIcon, iconSize: ICON_SIZE }),
@@ -27,7 +22,7 @@ const ICONS = {
   netto: new Icon({ iconUrl: nettoIcon, iconSize: ICON_SIZE }),
 };
 const SUPPORTED_BRANDS = ["foetex", "netto", "bilka"];
-const DEFAULT_POSITION = {
+const CENTRAL_COPENHAGEN = {
   latitude: 55.67389271215473,
   longitude: 12.568196510606882,
 }
@@ -52,7 +47,7 @@ export default function MapPage() {
   const geolocation = useGeolocation();
 
   // priority: sessionStorage, then geolocation, fallback to default position
-  const initialCenter = sessionLocation || geolocation || DEFAULT_POSITION;
+  const initialCenter = sessionLocation || geolocation || CENTRAL_COPENHAGEN;
   // slightly zoomed out when using default position
   const initialZoom = initialCenter == DEFAULT_POSITION ? 13 : 15;
 
@@ -60,6 +55,7 @@ export default function MapPage() {
   const supportedStores = stores.filter((store) => SUPPORTED_BRANDS.includes(store.brand));
 
   function handleStoreClick(event) {
+    // this value comes from the `data` prop on <Marker>
     const store = event.target.options.data;
     // update sessionStorage (will be used when returning to map)
     const [longitude, latitude] = store.coordinates;
