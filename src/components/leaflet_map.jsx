@@ -2,6 +2,10 @@ import { useEffect, useRef } from 'react';
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
 
+import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+
 export default function LeafletMap({ center, zoom, markerOptions, onMarkerClick, ...props }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
