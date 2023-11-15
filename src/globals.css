@@ -1,17 +1,15 @@
 @import "leaflet/dist/leaflet.css";
+@import "leaflet.markercluster/dist/MarkerCluster.css";
+@import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
-/* "reset" */
-*,
-:after,
-:before {
+/* https://every-layout.dev/rudiments/boxes/#the-box-sizing-property */
+* {
   box-sizing: border-box;
-  background-color: inherit;
-  font-family: inherit;
-  color: inherit;
-  overflow-wrap: break-word;
+}
+
+/* https://browserdefaultstyles.com/#body */
+body {
   margin: 0;
-  padding: 0;
-  border: 0 solid;
 }
 
 footer,
@@ -112,6 +110,10 @@ h3 {
     position: absolute;
     object-fit: contain;
     inset: 0;
+  }
+
+  & p {
+    margin: 0;
   }
 
   & span {

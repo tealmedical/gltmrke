@@ -1,13 +1,22 @@
 import { useLoaderData, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer } from "react-leaflet";
 
 import { useGeolocation, validateLatLng } from "../lib/location";
 import { useSessionStorage } from "../lib/storage";
 import { urlify } from "../lib/url";
 import { fetchSalling } from "../lib/salling";
 
-import MapCenterTracker from "../components/map_center_tracker";
-import MapBrandMarker from "../components/map_brand_marker";
+import LeafletMap from "../components/leaflet_map";
+
+// see https://vitejs.dev/guide/assets.html#static-asset-handling
+import bilkaIcon from '../assets/images/bilka.png'
+import føtexIcon from '../assets/images/føtex.png'
+import nettoIcon from '../assets/images/netto.png'
+
+export const ICONS = {
+  bilka: bilkaIcon,
+  foetex: føtexIcon,
+  netto: nettoIcon,
+};
 
 const SUPPORTED_BRANDS = ["foetex", "netto", "bilka"];
 const CENTRAL_COPENHAGEN = {
@@ -15,7 +24,7 @@ const CENTRAL_COPENHAGEN = {
   lng: 12.568196510606882,
 }
 const ZOOM_FAR = 13;
-const ZOOM_NEAR = 15;
+const ZOOM_NEAR = 16;
 
 // see https://reactrouter.com/en/main/start/tutorial#loading-data
 export async function loader() {
@@ -49,35 +58,31 @@ export default function Atlas() {
   // filter out unsupported stores
   const supportedStores = stores.filter((store) => SUPPORTED_BRANDS.includes(store.brand));
 
-  function handleStoreClick(event) {
+  function handleMarkerClick(event) {
     // this value comes from the `data` prop on <Marker>
-    const store = event.target.options.data;
+    const store = event.propagatedFrom.options.data;
     // update sessionStorage (will be used when returning to map)
     setSessionLocation(store.latLng);
     // trigger navigation to store page
     navigate(`/${urlify(store.name)}/${store.id}`);
   }
 
+  const markerOptions = supportedStores.map(store => ({
+    latLng: store.latLng,
+    icon: { iconUrl: ICONS[store.brand], iconSize: [50, 50] },
+    data: store,
+  }));
+
   return (
     <div className="atlas">
       <h2>VELKOMMEN TIL GULTMÆRKE.DK</h2>
       <h3>Vælg butik</h3>
-      <MapContainer center={center} zoom={zoom}>
-        <MapCenterTracker center={center} zoom={zoom} />
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {supportedStores.map((store) => (
-          <MapBrandMarker
-            key={store.id}
-            brand={store.brand}
-            position={store.latLng}
-            data={store}
-            eventHandlers={{ click: handleStoreClick }}
-          />
-        ))}
-      </MapContainer>
-    </div>
+      <LeafletMap
+        center={center}
+        zoom={zoom}
+        markerOptions={markerOptions}
+        onMarkerClick={handleMarkerClick}
+      />
+    </div >
   );
 }
