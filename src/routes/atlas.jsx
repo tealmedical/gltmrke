@@ -74,15 +74,16 @@ export default function Atlas() {
   }));
 
   return (
-    <div className="atlas">
+    <>
       <h2>VELKOMMEN TIL GULTMÆRKE.DK</h2>
       <h3>Vælg butik</h3>
       <LeafletMap
+        className="atlas"
         center={center}
         zoom={zoom}
         markerOptions={markerOptions}
         onMarkerClick={handleMarkerClick}
       />
-    </div >
+    </>
   );
 }
