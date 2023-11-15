@@ -17,6 +17,7 @@ export default function LeafletMap({ center, zoom, markerOptions, onMarkerClick,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(map);
 
+      // prepare markers
       const markers = markerOptions.map(({ latLng, icon, ...options }) => {
         return L.marker(latLng, {
           icon: L.icon(icon),
@@ -24,18 +25,22 @@ export default function LeafletMap({ center, zoom, markerOptions, onMarkerClick,
         });
       });
 
+      // add markers as a cluster group
       const cluster = L.markerClusterGroup();
       cluster.addLayers(markers);
       cluster.on('click', onMarkerClick)
       map.addLayer(cluster);
     }
 
+    // track center and zoom
     map.setView(center, zoom);
 
     return () => {
       if (mapRef.current === null) return;
-      mapRef.current.remove();
-      mapRef.current = null;
+      // technically we should destroy the map here
+      // but I think it'll mess everything up
+      /*mapRef.current.remove();
+      mapRef.current = null;*/
     }
   }, [center, zoom, markerOptions, onMarkerClick]);
 
